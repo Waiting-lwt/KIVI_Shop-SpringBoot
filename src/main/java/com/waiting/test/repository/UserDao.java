@@ -160,26 +160,4 @@ public class UserDao implements UserService{
         return 1;
     }
 
-    public List<UserCart> getSellerOrder(int userId) {
-        String sql = "SELECT orderLog.goodId,goodNum,goodImg,goodName,goodPrice " +
-                "FROM goodInfo,orderLog " +
-                "where sellerId = ? and goodInfo.goodId = orderLog.goodId;";
-        try{
-            //使用的query方法
-            return (List<UserCart>) jdbcTemplate.query(sql, new RowMapper<UserCart>(){
-                @Override
-                public UserCart mapRow(ResultSet rs, int rowNum) throws SQLException{
-                    UserCart cart = new UserCart();
-                    cart.setGoodId(rs.getInt("goodId"));
-                    cart.setGoodNum(rs.getInt("goodNum"));
-                    cart.setGoodImg(rs.getString("goodImg"));
-                    cart.setGoodName(rs.getString("goodName"));
-                    cart.setGoodPrice(rs.getDouble("goodPrice"));
-                    return cart;
-                }
-            },userId);
-        }catch(EmptyResultDataAccessException e){
-            return null;
-        }
-    }
 }

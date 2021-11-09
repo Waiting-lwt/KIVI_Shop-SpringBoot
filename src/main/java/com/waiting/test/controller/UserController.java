@@ -5,6 +5,7 @@ import com.waiting.test.domain.*;
 import com.waiting.test.service.GoodService;
 import com.waiting.test.service.MailService;
 import com.waiting.test.service.UserService;
+import com.waiting.test.service.SellerService;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSON;
@@ -22,6 +23,8 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private SellerService sellerService;
     @Autowired
     private GoodService goodService;
     @Autowired
@@ -102,7 +105,7 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(value = "/getSellerOrder", method = RequestMethod.GET)
-    public List<UserCart> getSellerOrder(int userId) {
-        return userService.getSellerOrder(userId);
+    public List<SellerOrder> getSellerOrder(int sellerId) {
+        return sellerService.getSellerOrder(sellerId);
     }
 }

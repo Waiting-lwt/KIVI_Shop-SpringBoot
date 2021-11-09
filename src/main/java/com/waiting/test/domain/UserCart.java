@@ -8,7 +8,7 @@ public class UserCart{
     public int goodNum;
     public UserCart(){
     }
-    public UserCart(int userId,int goodId,String goodName,double goodPrice,int goodNum,String goodImg){
+    public UserCart(int goodId,String goodName,double goodPrice,int goodNum,String goodImg){
         this.goodId = goodId;
         this.goodName = goodName;
         this.goodPrice = goodPrice;
