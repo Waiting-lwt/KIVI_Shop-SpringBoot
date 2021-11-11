@@ -1,9 +1,6 @@
 package com.waiting.test.repository;
 
-import com.waiting.test.domain.User;
-import com.waiting.test.domain.Good;
-import com.waiting.test.domain.UserCart;
-import com.waiting.test.domain.UserOrder;
+import com.waiting.test.domain.*;
 import com.waiting.test.service.MailService;
 import com.waiting.test.service.UserService;
 
@@ -160,4 +157,64 @@ public class UserDao implements UserService{
         return 1;
     }
 
+
+    public List<BuyerOrder> getBuyerOrder(int buyerId) {
+        String sql = "SELECT sellerId,buyerId,userInfo.userName as sellerName," +
+                "orderLog.goodId,goodNum,goodImg,goodName,goodPrice,orderTime " +
+                "FROM userInfo,goodInfo,orderLog " +
+                "where buyerId = ? and goodInfo.goodId = orderLog.goodId and userInfo.userId = sellerId ";
+        try{
+            //使用的query方法
+            return (List<BuyerOrder>) jdbcTemplate.query(sql, new RowMapper<BuyerOrder>(){
+                @Override
+                public BuyerOrder mapRow(ResultSet rs, int rowNum) throws SQLException {
+                    BuyerOrder order = new BuyerOrder();
+                    order.setUserId(buyerId);
+                    // int userId, int goodId,String goodName,double goodPrice,int goodNum,String goodImg
+                    order.setUserCart(new UserCart(
+                            rs.getInt("goodId"),
+                            rs.getString("goodName"),
+                            rs.getDouble("goodPrice"),
+                            rs.getInt("goodNum"),
+                            rs.getString("goodImg")));
+                    order.setUserId(rs.getInt("buyerId"));
+                    order.setSellerId(rs.getInt("sellerId"));
+                    order.setSellerName(rs.getString("sellerName"));
+                    order.setOrderTime(rs.getString("orderTime"));
+                    return order;
+                }
+            },buyerId);
+        }catch(EmptyResultDataAccessException e){
+            return null;
+        }
+    }
+
+
+    public List<UserBrowsed> getUserBrowsed(int userId) {
+        String sql = "SELECT browseLog.userId,browserId,userInfo.userName as browserName," +
+                "browseLog.goodId,goodImg,goodName,browseTime " +
+                "FROM userInfo,goodInfo,browseLog " +
+                "where browseLog.userId = ? and goodInfo.goodId = browseLog.goodId and userInfo.userId = browseLog.userId ";
+        try{
+            //使用的query方法
+            return (List<UserBrowsed>) jdbcTemplate.query(sql, new RowMapper<UserBrowsed>(){
+                @Override
+                public UserBrowsed mapRow(ResultSet rs, int rowNum) throws SQLException {
+                    UserBrowsed userBrowsed = new UserBrowsed();
+                    userBrowsed.setUserId(userId);
+                    // int userId, int goodId,String goodName,double goodPrice,int goodNum,String goodImg
+                    userBrowsed.setGoodId(rs.getInt("goodId"));
+                    userBrowsed.setGoodName(rs.getString("goodName"));
+                    userBrowsed.setGoodImg(rs.getString("goodImg"));
+                    userBrowsed.setUserId(rs.getInt("userId"));
+                    userBrowsed.setBrowserId(rs.getInt("browserId"));
+                    userBrowsed.setBrowserName(rs.getString("browserName"));
+                    userBrowsed.setBrowseTime(rs.getString("browseTime"));
+                    return userBrowsed;
+                }
+            },userId);
+        }catch(EmptyResultDataAccessException e){
+            return null;
+        }
+    }
 }

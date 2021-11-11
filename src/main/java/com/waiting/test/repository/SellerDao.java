@@ -1,5 +1,6 @@
 package com.waiting.test.repository;
 
+import com.waiting.test.domain.UserBrowsed;
 import com.waiting.test.domain.SellerOrder;
 import com.waiting.test.domain.UserCart;
 import com.waiting.test.service.SellerService;

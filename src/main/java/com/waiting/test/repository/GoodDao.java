@@ -61,6 +61,10 @@ public class GoodDao implements GoodService{
         }
     }
 
+    public int addGood(Good good) {
+        return 0;
+    }
+
     public List<Good> searchGoods(String content){
         String sql = "select * from goodInfo " +
                 "where goodName LIKE concat('%',?,'%')";
@@ -85,7 +89,35 @@ public class GoodDao implements GoodService{
         }
     }
 
-    @Override
+    public int updateGood(Good good){
+        String sql = "update goodInfo " +
+                "set goodName = ?,goodPrice = ?,goodInventory = ? "+
+                "where goodId = ? ";
+        try {
+            //使用的query方法
+            int ret = jdbcTemplate.update
+                    (sql, good.goodName, good.goodPrice, good.goodInventory, good.goodId);
+        }catch(EmptyResultDataAccessException e){
+            return 0;
+        }finally {
+            return 1;
+        }
+    }
+
+    public int deleteGood(Good good) {
+        String sql = "delete goodInfo " +
+                "where goodId = ? ";
+        try {
+            //使用的query方法
+            int ret = jdbcTemplate.update
+                    (sql, good.goodName, good.goodPrice, good.goodInventory, good.goodId);
+        }catch(EmptyResultDataAccessException e){
+            return 0;
+        }finally {
+            return 1;
+        }
+    }
+
     public List<Good> getSellerGoods(int userId) {
         String sql = "select * from goodInfo where goodSeller = ?";
         try{

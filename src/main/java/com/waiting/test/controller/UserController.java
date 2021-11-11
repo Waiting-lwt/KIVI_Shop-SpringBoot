@@ -1,20 +1,16 @@
 package com.waiting.test.controller;
 
-import com.mysql.cj.xdevapi.JsonArray;
 import com.waiting.test.domain.*;
 import com.waiting.test.service.GoodService;
 import com.waiting.test.service.MailService;
 import com.waiting.test.service.UserService;
 import com.waiting.test.service.SellerService;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSON;
+
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -85,7 +81,7 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(value = "/addOrder", method = RequestMethod.POST)
-    public int addOrder(int userId,@RequestBody  List<UserCart> selectCarts) {
+    public int addOrder(int userId,@RequestBody List<UserCart> selectCarts) {
         UserOrder userOrder = new UserOrder();
         userOrder.setUserId(userId);
         userOrder.setUserCarts(selectCarts);
@@ -93,7 +89,7 @@ public class UserController {
         mailService.sendSimpleMail(userOrder.getUserEmail(),
                 userOrder.getUserName()+"：您在KIVI电商平台上的订单",
                 userOrder.toString());
-        //addOrderLog
+        userService.addOrder(userOrder);
         return 1;
     }
 
@@ -108,4 +104,17 @@ public class UserController {
     public List<SellerOrder> getSellerOrder(int sellerId) {
         return sellerService.getSellerOrder(sellerId);
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/getBuyerOrder", method = RequestMethod.GET)
+    public List<BuyerOrder> getBuyerOrder(int buyerId) {
+        return userService.getBuyerOrder(buyerId);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/getUserBrowsed", method = RequestMethod.GET)
+    public List<UserBrowsed> getUserBrowsed(int userId) {
+        return userService.getUserBrowsed(userId);
+    }
+
 }

@@ -7,6 +7,7 @@ import com.waiting.test.repository.GoodDao;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -36,5 +37,23 @@ public class GoodController {
     @RequestMapping(value = "/searchGood", method = RequestMethod.GET)
     public List<Good> searchGood(String content){
         return goodService.searchGoods(content);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/updateGood", method = RequestMethod.PUT)
+    public int updateGood(@RequestBody Good good){
+        return goodService.updateGood(good);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/deleteGood", method = RequestMethod.PUT)
+    public int deleteGood(@RequestBody Good good){
+        return goodService.deleteGood(good);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/addGood", method = RequestMethod.POST)
+    public int addGood(@RequestBody Good good){
+        return goodService.addGood(good);
     }
 }

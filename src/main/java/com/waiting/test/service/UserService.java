@@ -1,8 +1,6 @@
 package com.waiting.test.service;
 
-import com.waiting.test.domain.User;
-import com.waiting.test.domain.UserCart;
-import com.waiting.test.domain.UserOrder;
+import com.waiting.test.domain.*;
 
 import java.util.List;
 
@@ -14,4 +12,6 @@ public interface UserService {
     int subCart(int userId,int goodId,int goodNum,String addTime);
 //    int addOrder(int userId, List<UserCart> selectedCarts);
     int addOrder(UserOrder userOrder);
+    List<BuyerOrder> getBuyerOrder(int buyerId);
+    List<UserBrowsed> getUserBrowsed(int userId);
 }

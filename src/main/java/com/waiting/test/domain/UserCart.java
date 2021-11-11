@@ -2,6 +2,8 @@ package com.waiting.test.domain;
 
 public class UserCart{
     public int goodId;
+    public int sellerId;
+    public int sellerName;
     public String goodName;
     public double goodPrice;
     public String goodImg;
