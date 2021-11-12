@@ -10,6 +10,12 @@ public class UserOrder extends User {
     public void setUserId(int userId){
         super.userId = userId;
     }
+    public int setUser(User user){
+        super.userId = user.userId;
+        super.userName = user.userName;
+        super.setUserEmail(user.getUserEmail());
+        return 0;
+    }
     public void setUserCarts(List<UserCart> userCarts){
         this.userCarts = userCarts;
     }

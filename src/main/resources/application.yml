@@ -4,20 +4,22 @@ server:
   tomcat.max-threads: 0
   tomcat.uri-encoding: UTF-8
 
-
 spring:
-  datasource:  #数据库配置
+  datasource:
     url: jdbc:mysql://47.106.104.174:3306/Waiting_WebExp
     username: waiting
     password: 882283LWTlwt___
     driver-class-name: com.mysql.cj.jdbc.Driver
   resources:
-    static-locations: classpath:/templates,classpath:/resources,classpath:/static,classpath:/public
+    static-locations: classpath:/templates,classpath:/resources,classpath:/static,classpath:/public,file:/home/waiting/WebDevelop/static
   mvc:
     static-path-pattern: /**
   mail:
-    host: smtp.qq.com  #配置POP3服务器
-    username: 1453828952@qq.com  #用户名
-    password: gmlxgcalxfgujdgc  #授权码
-    default-encoding: UTF-8  #编码格式
-    protocol: smtp  #使用的协议
+    host: smtp.qq.com
+    username: 1453828952@qq.com
+    password: gmlxgcalxfgujdgc
+    default-encoding: UTF-8
+    protocol: smtp
+
+file:
+  uploadImgPath: /home/waiting/WebDevelop/static

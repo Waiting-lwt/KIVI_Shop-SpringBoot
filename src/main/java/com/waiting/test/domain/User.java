@@ -38,4 +38,7 @@ public class User {
     public String getUserEmail(){
         return this.userEmail;
     }
+    public String getUserPassword(){
+        return this.userPassword;
+    }
 }

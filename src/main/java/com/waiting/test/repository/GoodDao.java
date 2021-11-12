@@ -62,7 +62,28 @@ public class GoodDao implements GoodService{
     }
 
     public int addGood(Good good) {
-        return 0;
+        // 返回maxId
+        int goodId = 0;
+        String sqlm = "select MAX(goodId) from goodInfo";
+        try{
+            goodId = jdbcTemplate.queryForObject(sqlm,int.class) + 1;
+        }catch(EmptyResultDataAccessException e){
+            return 0;
+        }
+
+        String sql = "insert into goodInfo " +
+                "(goodId, goodName, goodPrice, " +
+                "goodInventory, goodImg, goodSeller)" +
+                " values(?, ?, ?, ?, ?, ?)";
+        try {
+            int ret = jdbcTemplate.update
+                    (sql, goodId, good.goodName, good.goodPrice,
+                     good.goodInventory, good.goodImg, good.goodSeller);
+        }catch(EmptyResultDataAccessException e){
+            return -1;
+        }finally {
+            return 0;
+        }
     }
 
     public List<Good> searchGoods(String content){
@@ -91,12 +112,12 @@ public class GoodDao implements GoodService{
 
     public int updateGood(Good good){
         String sql = "update goodInfo " +
-                "set goodName = ?,goodPrice = ?,goodInventory = ? "+
+                "set goodName = ?,goodPrice = ?,goodInventory = ?,goodImg = ? "+
                 "where goodId = ? ";
         try {
             //使用的query方法
             int ret = jdbcTemplate.update
-                    (sql, good.goodName, good.goodPrice, good.goodInventory, good.goodId);
+                    (sql, good.goodName, good.goodPrice, good.goodInventory, good.goodImg, good.goodId);
         }catch(EmptyResultDataAccessException e){
             return 0;
         }finally {
@@ -104,17 +125,17 @@ public class GoodDao implements GoodService{
         }
     }
 
-    public int deleteGood(Good good) {
-        String sql = "delete goodInfo " +
+    public int deleteGood(int goodId) {
+        String sql = "delete from goodInfo " +
                 "where goodId = ? ";
         try {
             //使用的query方法
             int ret = jdbcTemplate.update
-                    (sql, good.goodName, good.goodPrice, good.goodInventory, good.goodId);
+                    (sql, goodId);
         }catch(EmptyResultDataAccessException e){
-            return 0;
+            return -1;
         }finally {
-            return 1;
+            return 0;
         }
     }
 

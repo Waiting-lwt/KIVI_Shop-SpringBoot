@@ -22,8 +22,5 @@ class TestApplicationTests {
 
 	@Test
 	void contextLoads() throws SQLException {
-		mailService.sendSimpleMail("waiting_lwt@126.com",
-				"hello",
-				"hello");
 	}
 }

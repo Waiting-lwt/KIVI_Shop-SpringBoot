@@ -1,29 +1,37 @@
 package com.waiting.test.controller;
 
 import com.waiting.test.domain.JSONResult;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import sun.misc.BASE64Decoder;
 
 import java.io.*;
+import java.util.Map;
 import java.util.UUID;
 
 @RequestMapping("/upload")
+@Controller
+@ConfigurationProperties(prefix="file")
 public class UploadController {
 
+    //上传路径
+    private String uploadImgPath;
+    public void setUploadImgPath(String uploadImgPath) {
+        this.uploadImgPath = uploadImgPath;
+    }
     private JSONResult jsonResult;
-    @Value("${file.uploadFolder}")
-    private String UPLOAD_FOLDER;
 
-    @PostMapping("/img")
-    public JSONResult<String> uploadImage(String base64Data){
-
+    @ResponseBody
+    @RequestMapping(value = "/goodImg", method = RequestMethod.POST)
+    public JSONResult<String> uploadImage(@RequestBody Map<String,String> request) throws FileNotFoundException {
+        String base64Img = request.get("img");
         String dataPrix = ""; //base64格式前头
         String data = "";//实体部分数据
-        if(base64Data==null||"".equals(base64Data)){
+        if(base64Img==null||"".equals(base64Img)){
             return jsonResult.failMsg("上传失败，上传图片数据为空");
         }else {
-            String [] d = base64Data.split("base64,");//将字符串分成数组
+            String [] d = base64Img.split("base64,");//将字符串分成数组
             if(d != null && d.length == 2){
                 dataPrix = d[0];
                 data = d[1];
@@ -49,7 +57,10 @@ public class UploadController {
         }
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         String tempFileName=uuid+suffix;
-        String imgFilePath = "G:\\Images\\"+tempFileName;//新生成的图片
+        //使用ResourceUtils
+//        String path = ResourceUtils.getURL("classpath:").getPath();
+//        String imgFilePath = path + "/static/images/goodImg/"+tempFileName; //localhost
+        String imgFilePath = uploadImgPath + "/images/goodImg/" + tempFileName;
         BASE64Decoder decoder = new BASE64Decoder();
         try {
             //Base64解码
@@ -64,7 +75,7 @@ public class UploadController {
             out.write(b);
             out.flush();
             out.close();
-            String imgurl="http://47.106.104.174:8080/"+tempFileName;
+            String imgurl="http://47.106.104.174:8080/images/goodImg/"+tempFileName;
             //imageService.save(imgurl);
             return jsonResult.success(imgurl);
         } catch (IOException e) {

@@ -11,12 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.util.HashMap;
 import java.util.Map;
 
 @Controller
 @RequestMapping("/user")
 public class UserController {
+
+    private Base64Util base64Util;
     @Autowired
     private UserService userService;
     @Autowired
@@ -28,9 +31,11 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(value = "/addUser", method = RequestMethod.POST)
-    public int addUser(@RequestBody Map<String, String> request){
-        int userId = userService.addUser(request.get("userName"),
-                request.get("userPassword"),request.get("userEmail"));
+    public int addUser(@RequestBody Map<String, Object> request){
+        int userId = userService.addUser(
+                (String) request.get("userName"),
+                (String) request.get("userPassword"),
+                (String) request.get("userEmail"));
         return userId;
     }
 
@@ -81,11 +86,11 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(value = "/addOrder", method = RequestMethod.POST)
-    public int addOrder(int userId,@RequestBody List<UserCart> selectCarts) {
+    public int addOrder(int userId, @RequestBody List<UserCart> selectCarts) {
         UserOrder userOrder = new UserOrder();
         userOrder.setUserId(userId);
         userOrder.setUserCarts(selectCarts);
-        userService.addOrder(userOrder);
+        userOrder.setUser(userService.selectUser(userId));
         mailService.sendSimpleMail(userOrder.getUserEmail(),
                 userOrder.getUserName()+"：您在KIVI电商平台上的订单",
                 userOrder.toString());

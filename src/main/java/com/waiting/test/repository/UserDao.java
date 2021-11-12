@@ -40,8 +40,13 @@ public class UserDao implements UserService{
             return 0;
         }
 
-        // add
-        String sqladd = "insert into userInfo(userId, userName, userType, userPassword, userEmail) values(?, ?, ?, ?, ?)";
+        System.out.println(userId);
+        System.out.println(name);
+        System.out.println(password);
+        System.out.println(email);
+        String sqladd = "insert into userInfo" +
+                "(userId, userName, userType, userPassword, userEmail)" +
+                " values(?, ?, ?, ?, ?)";
         Object[] params = new Object[]{userId,name,1,password,email};
         try{
             jdbcTemplate.update(sqladd, params);
@@ -68,6 +73,27 @@ public class UserDao implements UserService{
                     return stu;
                 }
             }, name);
+        }catch(EmptyResultDataAccessException e){
+            return null;
+        }
+    }
+
+    public User selectUser(int userId) {
+        String sql = "select * from userInfo where userId = ?";
+        try{
+            //使用的queryForObject方法
+            return jdbcTemplate.queryForObject(sql, new RowMapper<User>(){
+                @Override
+                public User mapRow(ResultSet rs, int rowNum) throws SQLException{
+                    User stu = new User(
+                            rs.getInt("userId"),
+                            rs.getString("userName"),
+                            rs.getShort("userType"),
+                            rs.getString("userPassword"),
+                            rs.getString("userEmail"));
+                    return stu;
+                }
+            }, userId);
         }catch(EmptyResultDataAccessException e){
             return null;
         }

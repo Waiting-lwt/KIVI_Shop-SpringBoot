@@ -8,7 +8,7 @@ public interface GoodService {
     public Good selectGood(int goodId);
     public int addGood(Good good);
     public int updateGood(Good good);
-    public int deleteGood(Good good);
+    public int deleteGood(int goodId);
     public List<Good> searchGoods(String content);
     public List<Good> getSellerGoods(int userId);
 }
