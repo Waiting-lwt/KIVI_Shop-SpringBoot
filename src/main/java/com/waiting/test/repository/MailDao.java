@@ -23,9 +23,6 @@ public class MailDao implements MailService {
         message.setSubject(subject);//主题
         message.setText(content);//内容
         message.setFrom(from);//发信人
-        System.out.println(message.getSubject());
-        System.out.println(message.getText());
-        System.out.println(message.getFrom());
         mailSender.send(message);
     }
 
