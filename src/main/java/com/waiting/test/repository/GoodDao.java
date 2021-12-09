@@ -30,7 +30,8 @@ public class GoodDao implements GoodService{
                             rs.getInt("goodInventory"),
                             rs.getString("goodIntro"),
                             rs.getString("goodImg"),
-                            rs.getInt("goodSeller"));
+                            rs.getInt("goodSeller"),
+                            "");
                     return good;
                 }
             });
@@ -39,7 +40,10 @@ public class GoodDao implements GoodService{
         }
     }
     public Good selectGood(int id){
-        String sql = "select * from goodInfo where goodId = ?";
+        String sql = "select goodId,goodName,goodPrice,goodInventory,goodIntro," +
+                "goodImg,goodSeller,userInfo.userName as goodSellerName " +
+                "from goodInfo,userInfo " +
+                "where goodId = ? and userInfo.userId = goodInfo.goodSeller";
         try{
             //使用的queryForObject方法
             return jdbcTemplate.queryForObject(sql, new RowMapper<Good>(){
@@ -52,7 +56,8 @@ public class GoodDao implements GoodService{
                             rs.getInt("goodInventory"),
                             rs.getString("goodIntro"),
                             rs.getString("goodImg"),
-                            rs.getInt("goodSeller"));
+                            rs.getInt("goodSeller"),
+                            rs.getString("goodSellerName"));
                     return good;
                 }
             },id);
@@ -101,7 +106,8 @@ public class GoodDao implements GoodService{
                             rs.getInt("goodInventory"),
                             rs.getString("goodIntro"),
                             rs.getString("goodImg"),
-                            rs.getInt("goodSeller"));
+                            rs.getInt("goodSeller"),
+                            "");
                     return good;
                 }
             },content);
@@ -153,7 +159,8 @@ public class GoodDao implements GoodService{
                             rs.getInt("goodInventory"),
                             rs.getString("goodIntro"),
                             rs.getString("goodImg"),
-                            rs.getInt("goodSeller"));
+                            rs.getInt("goodSeller"),
+                            "");
                     return good;
                 }
             },userId);

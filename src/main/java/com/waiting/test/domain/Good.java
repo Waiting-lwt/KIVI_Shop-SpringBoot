@@ -13,11 +13,12 @@ public class Good {
     public String goodIntro;
     public String goodImg;
     public int goodSeller;
+    public String goodSellerName;
 
     public Good() {
     }
     public Good(int goodId,String goodName,double goodPrice,int goodInventory,
-                String goodIntro,String goodImg,int goodSeller){
+                String goodIntro,String goodImg,int goodSeller,String goodSellerName){
         this.goodId = goodId;
         this.goodName = goodName;
         this.goodPrice = goodPrice;
@@ -25,6 +26,7 @@ public class Good {
         this.goodIntro = goodIntro;
         this.goodImg = goodImg;
         this.goodSeller = goodSeller;
+        this.goodSellerName = goodSellerName;
     }
 
     public void setGoodId(int goodId){

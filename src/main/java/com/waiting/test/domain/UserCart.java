@@ -3,7 +3,7 @@ package com.waiting.test.domain;
 public class UserCart{
     public int goodId;
     public int sellerId;
-    public int sellerName;
+    public String sellerName;
     public String goodName;
     public double goodPrice;
     public String goodImg;
@@ -32,6 +32,12 @@ public class UserCart{
     }
     public void setGoodNum(int goodNum){
         this.goodNum = goodNum;
+    }
+    public void setSellerId(int sellerId){
+        this.sellerId = sellerId;
+    }
+    public void setSellerName(String sellerName){
+        this.sellerName = sellerName;
     }
 
     public String getGoodName(){

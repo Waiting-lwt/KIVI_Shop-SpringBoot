@@ -2,16 +2,13 @@ package com.waiting.test.domain;
 
 import java.util.List;
 
-public class UserBrowsed extends Seller {
+public class UserBrowsed {
     public int goodId;
     public String goodName;
     public String goodImg;
     public String browseTime;
     public int browserId;
     public String browserName;
-    public void setUserId(int userId){
-        super.userId = userId;
-    }
     public void setGoodId(int goodId){
         this.goodId = goodId;
     }

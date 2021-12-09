@@ -7,6 +7,8 @@ import com.waiting.test.service.UserService;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -100,9 +102,10 @@ public class UserDao implements UserService{
     }
 
     public List<UserCart> getCart(int userId) {
-        String sql = "SELECT userCart.goodId,goodNum,goodImg,goodName,goodPrice " +
-                "FROM goodInfo,userCart " +
-                "where userId = ? and goodInfo.goodId = userCart.goodId;";
+        String sql = "SELECT userCart.goodId as goodId,goodNum,goodImg,goodName,goodPrice," +
+                "goodInfo.goodSeller as sellerId,goodInfo.goodSeller as sellerName " +
+                "FROM goodInfo,userCart,userInfo " +
+                "where userCart.userId = ? and goodInfo.goodId = userCart.goodId and goodInfo.goodSeller=userInfo.userId;";
         try{
             //使用的query方法
             return (List<UserCart>) jdbcTemplate.query(sql, new RowMapper<UserCart>(){
@@ -114,6 +117,8 @@ public class UserDao implements UserService{
                     cart.setGoodImg(rs.getString("goodImg"));
                     cart.setGoodName(rs.getString("goodName"));
                     cart.setGoodPrice(rs.getDouble("goodPrice"));
+                    cart.setSellerId(rs.getInt("sellerId"));
+                    cart.setSellerName(rs.getString("sellerName"));
                     return cart;
                 }
             },userId);
@@ -179,10 +184,71 @@ public class UserDao implements UserService{
         }
     }
 
-    public int addOrder(UserOrder userOrder){
-        return 1;
+    public int deleteCart(int userId,int goodId) {
+        String sql;
+
+        // 检查已有商品
+        boolean exit = true;
+        String sqlsel = "select exists (select * from userCart where userId = ? and goodId= ?)";
+        try{
+            exit = jdbcTemplate.queryForObject(sqlsel,boolean.class,userId,goodId);
+        }catch(EmptyResultDataAccessException e){
+            return 0;
+        }
+        sql = "delete from userCart " +
+                "where userId = ? and goodId = ?";
+        try {
+            //使用的query方法
+            int ret = jdbcTemplate.update(sql,userId,goodId);
+        }catch(EmptyResultDataAccessException e){
+            return 0;
+        }
+        return 0;
     }
 
+    public int deleteCarts(int userId,UserOrder userOrder) {
+
+        for(int i = 0; i<userOrder.userCarts.size(); i++){
+            // 检查已有商品
+            boolean exit = true;
+            String sqlsel = "select exists (select * from userCart where userId = ? and goodId= ?)";
+            try{
+                exit = jdbcTemplate.queryForObject(sqlsel,boolean.class,userId,userOrder.userCarts.get(i).goodId);
+            }catch(EmptyResultDataAccessException e){
+                return 0;
+            }
+            if(exit==false){
+                return -1;
+            }
+
+            String sql = "delete from userCart " +
+                    "where userId = ? and goodId = ?";
+            try {
+                //使用的query方法
+                int ret = jdbcTemplate.update(sql,userId,userOrder.userCarts.get(i).goodId);
+            }catch(EmptyResultDataAccessException e){
+                return 0;
+            }
+        }
+        return 0;
+    }
+
+    public int addOrder(int userId, UserOrder userOrder){
+        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+        for(int i = 0; i<userOrder.userCarts.size(); i++) {
+            String sql = "insert into orderLog " +
+                    "(orderLogId,goodId,buyerId,sellerId,goodNum,orderTime)" +
+                    "values(?, ?, ?, ?, ?, ?)";
+            try {
+                //使用的query方法
+                int ret = jdbcTemplate.update(sql, uuid, userOrder.userCarts.get(i).goodId, userId,
+                        userOrder.userCarts.get(i).sellerId,userOrder.userCarts.get(i).goodNum,userOrder.orderTime);
+            } catch (EmptyResultDataAccessException e) {
+                return 0;
+            }
+        }
+        return 1;
+    }
 
     public List<BuyerOrder> getBuyerOrder(int buyerId) {
         String sql = "SELECT sellerId,buyerId,userInfo.userName as sellerName," +
@@ -217,22 +283,20 @@ public class UserDao implements UserService{
 
 
     public List<UserBrowsed> getUserBrowsed(int userId) {
-        String sql = "SELECT browseLog.userId,browserId,userInfo.userName as browserName," +
+        String sql = "SELECT browseLog.browserId as browserId,browserId,userInfo.userName as browserName," +
                 "browseLog.goodId,goodImg,goodName,browseTime " +
                 "FROM userInfo,goodInfo,browseLog " +
-                "where browseLog.userId = ? and goodInfo.goodId = browseLog.goodId and userInfo.userId = browseLog.userId ";
+                "where browseLog.browserId = ? and goodInfo.goodId = browseLog.goodId and userInfo.userId = browseLog.browserId ";
         try{
             //使用的query方法
             return (List<UserBrowsed>) jdbcTemplate.query(sql, new RowMapper<UserBrowsed>(){
                 @Override
                 public UserBrowsed mapRow(ResultSet rs, int rowNum) throws SQLException {
                     UserBrowsed userBrowsed = new UserBrowsed();
-                    userBrowsed.setUserId(userId);
                     // int userId, int goodId,String goodName,double goodPrice,int goodNum,String goodImg
                     userBrowsed.setGoodId(rs.getInt("goodId"));
                     userBrowsed.setGoodName(rs.getString("goodName"));
                     userBrowsed.setGoodImg(rs.getString("goodImg"));
-                    userBrowsed.setUserId(rs.getInt("userId"));
                     userBrowsed.setBrowserId(rs.getInt("browserId"));
                     userBrowsed.setBrowserName(rs.getString("browserName"));
                     userBrowsed.setBrowseTime(rs.getString("browseTime"));
@@ -242,5 +306,39 @@ public class UserDao implements UserService{
         }catch(EmptyResultDataAccessException e){
             return null;
         }
+    }
+
+    public int addUserBrowsed(UserBrowsed userBrowsed) {
+        String sql_search = "select exists " +
+                "(select * from browseLog " +
+                "where goodId = ? and browserId = ?)";
+        boolean exit = false;
+        try{
+            exit = jdbcTemplate.queryForObject(sql_search,boolean.class,userBrowsed.goodId,userBrowsed.browserId);
+        }catch(EmptyResultDataAccessException e){
+            return 0;
+        }
+        if(!exit){ //新增浏览历史
+            String sql = "insert into browseLog" +
+                    "(goodId,browserId,browseTime) " +
+                    "values(?,?,?)";
+            try {
+                int ret = jdbcTemplate.update(sql,userBrowsed.goodId,userBrowsed.browserId,userBrowsed.browseTime);
+            }catch(EmptyResultDataAccessException e) {
+                return 0;
+            }
+        }
+        else{ //修改时间
+            String sql = "update browseLog " +
+                    "set browseTime = ? " +
+                    "where browserId = ? and goodId = ?";
+            try {
+                int ret = jdbcTemplate.update(sql,userBrowsed.browseTime,userBrowsed.browserId,userBrowsed.goodId);
+            }catch(EmptyResultDataAccessException e){
+                return 0;
+            }
+        }
+
+        return 1;
     }
 }

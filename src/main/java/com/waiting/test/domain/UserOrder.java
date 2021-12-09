@@ -4,6 +4,7 @@ import java.util.List;
 
 public class UserOrder extends User {
     public List<UserCart> userCarts;
+    public String orderTime;
     public UserOrder(){
         userCarts = null;
     }
@@ -16,11 +17,11 @@ public class UserOrder extends User {
         super.setUserEmail(user.getUserEmail());
         return 0;
     }
+    public void setOrderTime(String orderTime){
+        this.orderTime = orderTime;
+    }
     public void setUserCarts(List<UserCart> userCarts){
         this.userCarts = userCarts;
-    }
-    public void addCart(UserCart userCart){
-        this.userCarts.add(userCart);
     }
     @Override
     public String toString(){

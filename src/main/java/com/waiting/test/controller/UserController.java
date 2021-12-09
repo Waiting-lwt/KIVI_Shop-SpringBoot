@@ -85,16 +85,26 @@ public class UserController {
     }
 
     @ResponseBody
+    @RequestMapping(value = "/deleteCart", method = RequestMethod.PUT)
+    public int deleteCart(@RequestBody Map<String, Object> request) {
+        return userService.deleteCart(
+                (Integer) request.get("userId"),
+                (Integer) request.get("goodId"));
+    }
+
+    @ResponseBody
     @RequestMapping(value = "/addOrder", method = RequestMethod.POST)
-    public int addOrder(int userId, @RequestBody List<UserCart> selectCarts) {
+    public int addOrder(int userId, String orderTime, @RequestBody List<UserCart> selectCarts) {
         UserOrder userOrder = new UserOrder();
         userOrder.setUserId(userId);
         userOrder.setUserCarts(selectCarts);
         userOrder.setUser(userService.selectUser(userId));
+        userOrder.setOrderTime(orderTime);
         mailService.sendSimpleMail(userOrder.getUserEmail(),
                 userOrder.getUserName()+"：您在KIVI电商平台上的订单",
                 userOrder.toString());
-        userService.addOrder(userOrder);
+        userService.addOrder(userId,userOrder);
+        userService.deleteCarts(userId,userOrder);
         return 1;
     }
 
@@ -122,4 +132,9 @@ public class UserController {
         return userService.getUserBrowsed(userId);
     }
 
+    @ResponseBody
+    @RequestMapping(value = "/addUserBrowsed", method = RequestMethod.POST)
+    public int addUserBrowsed(@RequestBody UserBrowsed userBrowsed){
+        return userService.addUserBrowsed(userBrowsed);
+    }
 }

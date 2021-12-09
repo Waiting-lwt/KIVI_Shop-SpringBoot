@@ -11,7 +11,10 @@ public interface UserService {
     List<UserCart> getCart(int userId);
     int addCart(int userId,int goodId,int goodNum,String addTime);
     int subCart(int userId,int goodId,int goodNum,String addTime);
-    int addOrder(UserOrder userOrder);
+    int deleteCarts(int userId,UserOrder userOrder);
+    int deleteCart(int userId,int goodId);
+    int addOrder(int userId,UserOrder userOrder);
     List<BuyerOrder> getBuyerOrder(int buyerId);
     List<UserBrowsed> getUserBrowsed(int userId);
+    int addUserBrowsed(UserBrowsed userBrowsed);
 }
