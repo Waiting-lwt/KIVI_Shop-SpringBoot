@@ -6,14 +6,20 @@ import com.waiting.test.service.MailService;
 import com.waiting.test.service.UserService;
 import com.waiting.test.service.SellerService;
 
-import java.util.List;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/user")
@@ -31,17 +37,37 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(value = "/addUser", method = RequestMethod.POST)
-    public int addUser(@RequestBody Map<String, Object> request){
+    public int addUser(@RequestBody Map<String, Object> request,HttpServletResponse response) throws IOException {
+        String userName = (String) request.get("userName");
         int userId = userService.addUser(
                 (String) request.get("userName"),
                 (String) request.get("userPassword"),
                 (String) request.get("userEmail"));
+        if(userId==-1){
+            return -1;
+        }
+        else {
+            Cookie cookie1 = new Cookie("userId",String.valueOf(userId));
+            Cookie cookie2 = new Cookie("userName",String.valueOf(userName));
+            Cookie cookie3 = new Cookie("userType","1");
+            cookie1.setPath("/");   //
+            cookie1.setMaxAge(24*60*60*30);       //存活30天
+            cookie2.setPath("/");   //
+            cookie2.setMaxAge(24*60*60*30);       //存活30天
+            cookie3.setPath("/");   //
+            cookie3.setMaxAge(24*60*60*30);       //存活30天
+            response.setHeader("Access-Control-Allow-Credentials", "true");
+            response.addCookie(cookie1);
+            response.addCookie(cookie2);
+            response.addCookie(cookie3);
+        }
         return userId;
     }
 
     @ResponseBody
     @RequestMapping(value = "/getUser", method = RequestMethod.GET)
-    public Map<String, Object> getUser(String userName, String userPassword){
+    public Map<String, Object> getUser(String userName, String userPassword,HttpServletResponse response){
+        //@CookieValue(value = "userId", defaultValue = "0") Integer userId
         User user = userService.selectUser(userName);
         if(user==null){
             return null;
@@ -50,6 +76,22 @@ public class UserController {
             map.put("userId", -1);
             return map;
         }
+
+        Cookie cookie1 = new Cookie("userId",String.valueOf(user.userId));
+        Cookie cookie2 = new Cookie("userName",String.valueOf(userName));
+        Cookie cookie3 = new Cookie("userType",String.valueOf(user.userType));
+        cookie1.setPath("/");   //
+        cookie1.setMaxAge(24*60*60*30);       //存活30天
+        cookie1.setHttpOnly(true);
+        cookie2.setPath("/");   //
+        cookie2.setMaxAge(24*60*60*30);       //存活30天
+        cookie3.setPath("/");   //
+        cookie3.setMaxAge(24*60*60*30);       //存活30天
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.addCookie(cookie1);
+        response.addCookie(cookie2);
+        response.addCookie(cookie3);
+
         Map<String, Object> map = new HashMap<>(1);
         map.put("userId", user.userId);
         map.put("userName", user.userName);
@@ -60,15 +102,15 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(value = "/getCart", method = RequestMethod.GET)
-    public List<UserCart> getCart(int userId) {
+    public List<UserCart> getCart(@CookieValue(value = "userId", defaultValue = "0") Integer userId) {
         return userService.getCart(userId);
     }
 
     @ResponseBody
     @RequestMapping(value = "/addCart", method = RequestMethod.PUT)
-    public int addCart(@RequestBody Map<String, Object> request) {
+    public int addCart(@RequestBody Map<String, Object> request,@CookieValue(value = "userId", defaultValue = "0") Integer userId) {
         return userService.addCart(
-                (Integer) request.get("userId"),
+                userId,
                 (Integer) request.get("goodId"),
                 (Integer) request.get("goodNum"),
                 (String) request.get("addTime"));
@@ -76,9 +118,9 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(value = "/subCart", method = RequestMethod.PUT)
-    public int subCart(@RequestBody Map<String, Object> request) {
+    public int subCart(@RequestBody Map<String, Object> request,@CookieValue(value = "userId", defaultValue = "0") Integer userId) {
         return userService.subCart(
-                (Integer) request.get("userId"),
+                userId,
                 (Integer) request.get("goodId"),
                 (Integer) request.get("goodNum"),
                 (String) request.get("addTime"));
@@ -86,15 +128,15 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(value = "/deleteCart", method = RequestMethod.PUT)
-    public int deleteCart(@RequestBody Map<String, Object> request) {
+    public int deleteCart(@RequestBody Map<String, Object> request,@CookieValue(value = "userId", defaultValue = "0") Integer userId) {
         return userService.deleteCart(
-                (Integer) request.get("userId"),
+                userId,
                 (Integer) request.get("goodId"));
     }
 
     @ResponseBody
     @RequestMapping(value = "/addOrder", method = RequestMethod.POST)
-    public int addOrder(int userId, String orderTime, @RequestBody List<UserCart> selectCarts) {
+    public int addOrder(String orderTime, @RequestBody List<UserCart> selectCarts,@CookieValue(value = "userId", defaultValue = "0") Integer userId) {
         UserOrder userOrder = new UserOrder();
         userOrder.setUserId(userId);
         userOrder.setUserCarts(selectCarts);
@@ -110,31 +152,32 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(value = "/getSellerGood", method = RequestMethod.GET)
-    public List<Good> getGood(int userId){
+    public List<Good> getGood(@CookieValue(value = "userId", defaultValue = "0") Integer userId){
         return goodService.getSellerGoods(userId);
     }
 
     @ResponseBody
     @RequestMapping(value = "/getSellerOrder", method = RequestMethod.GET)
-    public List<SellerOrder> getSellerOrder(int sellerId) {
-        return sellerService.getSellerOrder(sellerId);
+    public List<SellerOrder> getSellerOrder(@CookieValue(value = "userId", defaultValue = "0") Integer userId) {
+        return sellerService.getSellerOrder(userId);
     }
 
     @ResponseBody
     @RequestMapping(value = "/getBuyerOrder", method = RequestMethod.GET)
-    public List<BuyerOrder> getBuyerOrder(int buyerId) {
-        return userService.getBuyerOrder(buyerId);
+    public List<BuyerOrder> getBuyerOrder(@CookieValue(value = "userId", defaultValue = "0") Integer userId) {
+        return userService.getBuyerOrder(userId);
     }
 
     @ResponseBody
     @RequestMapping(value = "/getUserBrowsed", method = RequestMethod.GET)
-    public List<UserBrowsed> getUserBrowsed(int userId) {
+    public List<UserBrowsed> getUserBrowsed(@CookieValue(value = "userId", defaultValue = "0") Integer userId) {
         return userService.getUserBrowsed(userId);
     }
 
     @ResponseBody
     @RequestMapping(value = "/addUserBrowsed", method = RequestMethod.POST)
-    public int addUserBrowsed(@RequestBody UserBrowsed userBrowsed){
+    public int addUserBrowsed(@RequestBody UserBrowsed userBrowsed,@CookieValue(value = "userId", defaultValue = "0") Integer userId){
+        userBrowsed.browserId = userId;
         return userService.addUserBrowsed(userBrowsed);
     }
 }

@@ -7,10 +7,7 @@ import com.waiting.test.repository.GoodDao;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +38,8 @@ public class GoodController {
 
     @ResponseBody
     @RequestMapping(value = "/updateGood", method = RequestMethod.PUT)
-    public int updateGood(@RequestBody Good good){
+    public int updateGood(@RequestBody Good good,@CookieValue(value = "userId", defaultValue = "0") Integer userId){
+        good.goodSeller = userId;
         return goodService.updateGood(good);
     }
 
@@ -53,7 +51,8 @@ public class GoodController {
 
     @ResponseBody
     @RequestMapping(value = "/addGood", method = RequestMethod.POST)
-    public int addGood(@RequestBody Good good){
+    public int addGood(@RequestBody Good good,@CookieValue(value = "userId", defaultValue = "0") Integer userId){
+        good.goodSeller = userId;
         return goodService.addGood(good);
     }
 }

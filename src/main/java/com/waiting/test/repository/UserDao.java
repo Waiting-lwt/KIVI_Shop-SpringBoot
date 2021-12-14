@@ -42,10 +42,6 @@ public class UserDao implements UserService{
             return 0;
         }
 
-        System.out.println(userId);
-        System.out.println(name);
-        System.out.println(password);
-        System.out.println(email);
         String sqladd = "insert into userInfo" +
                 "(userId, userName, userType, userPassword, userEmail)" +
                 " values(?, ?, ?, ?, ?)";
@@ -176,7 +172,7 @@ public class UserDao implements UserService{
                 "where userId = ? and goodId = ?";
         try {
             //使用的query方法
-            int ret = jdbcTemplate.update(sql, goodNum, userId, goodId);
+            int ret = jdbcTemplate.update(sql, goodNum, addTime, userId, goodId);
         }catch(EmptyResultDataAccessException e){
             return 0;
         }finally {
