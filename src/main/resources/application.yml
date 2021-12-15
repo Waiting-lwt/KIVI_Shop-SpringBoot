@@ -5,6 +5,8 @@ server:
   tomcat.uri-encoding: UTF-8
 
 spring:
+  main:
+    allow-bean-definition-overriding: true
   datasource:
     url: jdbc:mysql://47.106.104.174:3306/Waiting_WebExp
     username: waiting

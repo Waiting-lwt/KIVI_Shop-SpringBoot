@@ -17,4 +17,5 @@ public interface UserService {
     List<BuyerOrder> getBuyerOrder(int buyerId);
     List<UserBrowsed> getUserBrowsed(int userId);
     int addUserBrowsed(UserBrowsed userBrowsed);
+    User findByToken(String token);
 }

@@ -2,7 +2,8 @@ package com.waiting.test.domain;
 
 import java.util.List;
 
-public class BuyerOrder extends User {
+public class BuyerOrder {
+    public Integer userId;
     public UserCart userOrder;
     public String orderTime;
     public int sellerId;
@@ -11,7 +12,7 @@ public class BuyerOrder extends User {
         userOrder = null;
     }
     public void setUserId(int userId){
-        super.userId = userId;
+        this.userId = userId;
     }
     public void setSellerId(int sellerId){
         this.sellerId = sellerId;

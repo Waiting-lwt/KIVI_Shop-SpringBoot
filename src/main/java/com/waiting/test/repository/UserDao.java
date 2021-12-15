@@ -337,4 +337,26 @@ public class UserDao implements UserService{
 
         return 1;
     }
+
+    @Override
+    public User findByToken(String token) {
+        System.out.print("findByToken:");
+        System.out.println(token);
+        User user = new User();
+        user.setUserToken(token);
+        Integer userId = user.getUserTokenId();
+        user.userId = userId;
+        System.out.println(userId);
+        String sql_search = "select exists " +
+                "(select * from userInfo " +
+                "where userId = ?)";
+        boolean exit = false;
+        try {
+            exit = jdbcTemplate.queryForObject(sql_search,boolean.class,userId);
+        }catch(EmptyResultDataAccessException e) {
+            return null;
+        }finally {
+            return user;
+        }
+    }
 }
