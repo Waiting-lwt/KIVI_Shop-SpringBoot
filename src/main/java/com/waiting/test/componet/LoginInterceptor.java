@@ -40,7 +40,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             return false;
         }
         //1. 根据token，查询用户信息
-//        User user = userService.findByToken(token); ???????
+//        User user = userService.findByToken(token);
         //2. 若用户不存在,
         if (TokenUtil.getUserId(token) == 0) {
             response.setContentType("text/html;charset=utf-8");

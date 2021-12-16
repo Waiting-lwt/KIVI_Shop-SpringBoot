@@ -7,19 +7,16 @@ import com.waiting.test.service.UserService;
 import com.waiting.test.service.SellerService;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.util.*;
 
+import com.waiting.test.utils.Base64Util;
 import com.waiting.test.utils.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Controller
@@ -70,7 +67,7 @@ public class UserController {
     @ResponseBody
     @RequestMapping(value = "/getUser", method = RequestMethod.GET)
     public Map<String, Object> getUser(String userName, String userPassword,HttpServletResponse response){
-        //@CookieValue(value = "userId", defaultValue = "0") Integer userId
+
         User user = userService.selectUser(userName);
         if(user==null){
             return null;
@@ -84,14 +81,15 @@ public class UserController {
         Cookie cookie1 = new Cookie("userToken",token);
         Cookie cookie2 = new Cookie("userName",userName);
         Cookie cookie3 = new Cookie("userType",String.valueOf(user.userType));
-        cookie1.setHttpOnly(true);
-        cookie1.setPath("/");   //
+        cookie1.setHttpOnly(true);            //HttpOnly避免XSS攻击
+        cookie1.setDomain("http://47.106.104.174:8081/");   //cookie的有效域
+        cookie1.setPath("/");   //cookie的有效路径
         cookie1.setMaxAge(24*60*60*30);       //存活30天
         cookie2.setPath("/");   //
         cookie2.setMaxAge(24*60*60*30);       //存活30天
         cookie3.setPath("/");   //
         cookie3.setMaxAge(24*60*60*30);       //存活30天
-        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setHeader("Access-Control-Allow-Credentials", "true");   //跨域
         response.addCookie(cookie1);
         response.addCookie(cookie2);
         response.addCookie(cookie3);

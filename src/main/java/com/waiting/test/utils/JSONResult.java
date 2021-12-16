@@ -1,5 +1,5 @@
 
-package com.waiting.test.domain;
+package com.waiting.test.utils;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

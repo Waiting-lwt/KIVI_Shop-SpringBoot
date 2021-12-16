@@ -9,6 +9,14 @@ public class UserBrowsed {
     public String browseTime;
     public int browserId;
     public String browserName;
+    public UserBrowsed(){
+        this.goodId = 0;
+        this.goodName = null;
+        this.goodImg = null;
+        this.browseTime = null;
+        this.browserId = 0;
+        this.browserName = null;
+    }
     public void setGoodId(int goodId){
         this.goodId = goodId;
     }

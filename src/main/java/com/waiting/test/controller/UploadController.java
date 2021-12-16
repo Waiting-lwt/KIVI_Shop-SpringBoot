@@ -1,6 +1,6 @@
 package com.waiting.test.controller;
 
-import com.waiting.test.domain.JSONResult;
+import com.waiting.test.utils.JSONResult;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -40,26 +40,20 @@ public class UploadController {
             }
         }
         String suffix = "";//图片后缀，用以识别哪种格式数据
-        //data:image/jpeg;base64,base64编码的jpeg图片数据
         if("data:image/jpeg;".equalsIgnoreCase(dataPrix)){
             suffix = ".jpg";
         }else if("data:image/x-icon;".equalsIgnoreCase(dataPrix)){
-            //data:image/x-icon;base64,base64编码的icon图片数据
             suffix = ".ico";
         }else if("data:image/gif;".equalsIgnoreCase(dataPrix)){
-            //data:image/gif;base64,base64编码的gif图片数据
             suffix = ".gif";
         }else if("data:image/png;".equalsIgnoreCase(dataPrix)){
-            //data:image/png;base64,base64编码的png图片数据
             suffix = ".png";
         }else {
             return jsonResult.failMsg("上传失败，上传图片格式不合法");
         }
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         String tempFileName=uuid+suffix;
-        //使用ResourceUtils
-//        String path = ResourceUtils.getURL("classpath:").getPath();
-//        String imgFilePath = path + "/static/images/goodImg/"+tempFileName; //localhost
+
         String imgFilePath = uploadImgPath + "/images/goodImg/" + tempFileName;
         BASE64Decoder decoder = new BASE64Decoder();
         try {

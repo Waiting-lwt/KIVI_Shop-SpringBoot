@@ -6,7 +6,9 @@ public class UserOrder extends User {
     public List<UserCart> userCarts;
     public String orderTime;
     public UserOrder(){
+        super();
         userCarts = null;
+        orderTime = null;
     }
     public void setUserId(int userId){
         super.userId = userId;

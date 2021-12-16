@@ -9,6 +9,13 @@ public class UserCart{
     public String goodImg;
     public int goodNum;
     public UserCart(){
+        this.goodId = 0;
+        this.sellerId = 0;
+        this.sellerName = null;
+        this.goodName = null;
+        this.goodPrice = 0;
+        this.goodImg = null;
+        this.goodNum = 0;
     }
     public UserCart(int goodId,String goodName,double goodPrice,int goodNum,String goodImg){
         this.goodId = goodId;

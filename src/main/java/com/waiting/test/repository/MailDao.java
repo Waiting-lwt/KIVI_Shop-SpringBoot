@@ -17,7 +17,6 @@ public class MailDao implements MailService {
     private String from = "1453828952@qq.com";
 
     public void sendSimpleMail(String to, String subject, String content) {
-
         SimpleMailMessage message = new SimpleMailMessage();//创建一个简单文本邮件的对象
         message.setTo(to);//收信人
         message.setSubject(subject);//主题
